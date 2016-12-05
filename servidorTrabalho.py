@@ -16,9 +16,10 @@ def receberCliente(conn):
     return dado
 
 #tratamento de conn.send()
-def mandarCliente(conn, mensagem):
+def mandarTodosClientes(conn, mensagem):
     try:
         conn.send(mensagem)
+        print conn
     except Exception as e:
         print "Erro: 22 Cliente nao existe!"
 
@@ -26,7 +27,7 @@ def reDadoCliente(conn,addr):
     dado = receberCliente(conn)
     nickname = dado
     sentence = "Ola " + nickname +"\n" + nickname + " >>"
-    mandarCliente(conn, sentence)
+    mandarTodosClientes(conn, sentence)
     print nickname + " entrou na sala..."
     while 1:
         dado = receberCliente(conn)
@@ -35,13 +36,15 @@ def reDadoCliente(conn,addr):
             conn.close()
             break
         if dado == "//nick()":
-            mandarCliente(conn,"Digite seu novo nick: ")
+            mandarTodosClientes(conn,"Digite seu novo nick: ")
             nickname = receberCliente(conn)
             sentence = "Seu novo nickname e: " + nickname
-            mandarCliente(conn, sentence)
+            mandarTodosClientes(conn, sentence)
         else:
-            msgServer = dado + " \n" + nickname + ">>"
-            mandarCliente(conn, msgServer)
+            msgServer = dado
+            #+ " \n" + nickname + ">>"
+            for i in connections:
+                mandarTodosClientes(connections, msgServer)
             print nickname + " disse: " + dado
 
 
@@ -53,12 +56,14 @@ serverSocket.bind((serverName,serverPort)) # bind do ip do servidor com a porta
 serverSocket.listen(1) # socket pronto para "ouvir" conexoes
 connections = []
 addresses = []
+
 while 1:
     print "Servidor TCP esperando conexoes na porta %d ..." % (serverPort)
     connectionSocket, addr = serverSocket.accept() # aceita as conexoes dos clientes
     print"Cliente [%s:%s]:Conectado!" % (addr[0], addr[1])
     t = Thread(target = reDadoCliente, args = (connectionSocket,addr))
     t.start()
+    connections.append(connectionSocket);
 
 
 
