@@ -8,6 +8,7 @@ serverPort = 12000 # porta a se conectar
 clientSocket = socket(AF_INET,SOCK_STREAM) # criacao do socket TCP
 clientSocket.connect((serverName, serverPort)) # conecta o socket ao servidor
 nickname = ''
+
 def iniciarConexao():
     tes = 1
     print 'Bem- vindo ao nosso chat, para mais informacoes digite //mais()'
@@ -44,24 +45,32 @@ def enviarServidor(arg):
 def mais():
     print 'Digite //nick() para alterar o seu Nickname/n'
     print 'Digite //stop() para sair do chat'
+
+def printarLoop():
+    while 1:
+        dado = receberServidor()
+        print dado
+
 iniciarConexao()
+t = Thread(target = printarLoop,args = ())
+
 while 1:
     clientResponse = raw_input()
     if clientResponse == "//mais()":
         mais()
     if clientResponse == "//nick()":
         enviarServidor(clientResponse)
-        serverResponse = receberServidor()
-        print serverResponse
+        #serverResponse = receberServidor()
+        #print serverResponse
         clientResponse = input()
         enviarServidor(clientResponse)
-        serverResponse = receberServidor()
+        #serverResponse = receberServidor()
         nickname = serverResponse
-        print serverResponse
+        #print serverResponse
     else:
         enviarServidor(clientResponse)
-        serverResponse = receberServidor()
-        print serverResponse
+        #serverResponse = receberServidor()
+        #print serverResponse
         if serverResponse == "Ate a proxima!":
             time.sleep(1)
             clientSocket.close()
