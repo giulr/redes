@@ -71,6 +71,6 @@ while 1:
         enviarServidor(clientResponse)
         #serverResponse = receberServidor()
         #print serverResponse
-        if serverResponse == "Ate a proxima!":
-            time.sleep(1)
-            clientSocket.close()
+        #if serverResponse == "Ate a proxima!":
+            #time.sleep(1)
+            #clientSocket.close()
