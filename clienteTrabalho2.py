@@ -3,13 +3,11 @@ from threading import Thread # thread
 import time
 
 # definicao das variaveis
-#teste
 serverName = 'localhost' # ip do servidor
 serverPort = 12000 # porta a se conectar
 clientSocket = socket(AF_INET,SOCK_STREAM) # criacao do socket TCP
 clientSocket.connect((serverName, serverPort)) # conecta o socket ao servidor
 nickname = ''
-
 def iniciarConexao():
     tes = 1
     print 'Bem- vindo ao nosso chat, para mais informacoes digite //mais()'
@@ -30,7 +28,7 @@ def iniciarConexao():
             serverResponse = receberServidor()
             print serverResponse
         else:
-            print "Porfavor Digite seu nome sem ser apenas espaco e tenha algum nome ou algo to tipo."
+            print "Por favor Digite seu nome sem ser apenas espaco e tenha algum nome ou algo to tipo."
             tes = 1
 
 def receberServidor():
@@ -44,10 +42,11 @@ def enviarServidor(arg):
         clientSocket.send(arg)
 
 def mais():
-    print 'Digite //nick() para alterar o seu Nickname/n'
-    print 'Digite //stop() para sair do chat'
+    print 'Digite //nick para alterar o seu Nickname/n'
+    print 'Digite //stop para sair do chat'
 iniciarConexao()
 while 1:
+    print "You: "
     clientResponse = raw_input()
     if clientResponse == "//mais()":
         mais()
