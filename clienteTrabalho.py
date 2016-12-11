@@ -9,7 +9,7 @@ clientSocket.connect((serverName, serverPort)) # conecta o socket ao servidor
 nickname = ''
 def iniciarConexao():
     tes = 1;
-    print 'Bem- vindo ao nosso chat, para mais informacoes digite //mais'
+    print 'Bem- vindo ao nosso chat, para mais informacoes digite mais()'
     while tes:
         clientResponse = raw_input('Digite o seu nickname: ')
         try:
@@ -42,15 +42,16 @@ def enviarServidor(arg):
         clientSocket.send(arg)
 
 def mais():
-    print 'Digite altNick para alterar o seu Nickname/n'
-    print 'Digite //stop para sair do chat'
+    print 'Digite nome(*) para alterar o seu Nickname\n'
+    print "Digite lista() para mostrar todos os participantes do chat\n"
+    print 'Digite sair() para sair do chat\n'
 iniciarConexao();
 while 1:
     print "You: "
     clientResponse = raw_input();
-    if clientResponse == "//mais":
+    if clientResponse == "mais()":
         mais();
-    if clientResponse == "//altNick":
+    if clientResponse == "lista()":
         enviarServidor(clientResponse);
         serverResponse = receberServidor();
         print serverResponse;
@@ -62,8 +63,13 @@ while 1:
     else:
         enviarServidor(clientResponse);
         serverResponse = receberServidor();
-        print serverResponse;
-        if serverResponse == "Ate a proxima!":
+        if serverResponse == "FIM":
             time.sleep(1)
             clientSocket.close();
+            print "Voce saiu do chat!\nAte a proxima!"
+            time.sleep(5)
+            break;
+        else:
+            print serverResponse;
+        
        
