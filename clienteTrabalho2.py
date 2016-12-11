@@ -42,8 +42,9 @@ def enviarServidor(arg):
         clientSocket.send(arg)
 
 def mais():
-    print 'Digite altNick para alterar o seu Nickname/n'
-    print 'Digite //stop para sair do chat'
+    print 'Digite //altNick para alterar o seu Nickname\n'
+    print "Digite //mostrarParticipantes para mostrar todos os participantes do chat\n"
+    print 'Digite //stop para sair do chat\n'
 iniciarConexao();
 while 1:
     print "You: "
@@ -62,7 +63,13 @@ while 1:
     else:
         enviarServidor(clientResponse);
         serverResponse = receberServidor();
-        print serverResponse;
-        if serverResponse == "Ate a proxima!":
+        if serverResponse == "FIM":
             time.sleep(1)
             clientSocket.close();
+            print "Voce saiu do chat!\nAte a proxima!"
+            time.sleep(5)
+            break;
+        else:
+            print serverResponse;
+        
+       
