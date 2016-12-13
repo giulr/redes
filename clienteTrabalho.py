@@ -5,24 +5,32 @@ import re
 def trocaDados(connSocket, nameServer, papel, nick):
     check = 'NOT A CRITERIA';
     while 1:
-        if check[0] == "pvt":
-            request = raw_input("esta aqui?");
-
-            if request == "S":
-                enviarServidor(nameServer, connSocket);
+        #print check; #print para verificar a posicao de um valor na string (testes)
+        if check[0] == "pvt": #flag de iniciar uma conexao privada
+            request = raw_input();
+            if request == "S": #aceita uma solicitacao de conexao privada
+                port = " 13000"
+                msg = "//flag " + nameServer;
+                sentence = msg + port;
+                enviarServidor(sentence , connSocket);
                 papel = 'SERVIDOR'
-                t2 = Thread (target = ReceberConexao, args = (nameServer, papel, AceitaMaxConn, nick));
-                t2.start();
+                tServer = Thread (target = ReceberConexao, args = (nameServer, papel, AceitaMaxConn, nick));
+                tServer.start();
                 connSocket.close();
-               
-                
-                
+        if len(check) >= 5 and check[4] == "//flag": #verifica se a string tem uma flag com o endereco do server p2p
+            server = check[5];
+            port = 13000;
+            papel = 'CLIENTE';
+            tClient = Thread (target = ConectarAServidorPrivado, args = (server, port,nick));
+            tClient.start();
+            connSocket.close();
+            break;
         else:
             print "You: "
             request = raw_input();
-            if request == "mais()":
+            if request == "mais()": #mostra ao usuario outras opcoes
                 mais();
-            if request == "nome()":
+            if request == "nome()": #muda nick
                 enviarServidor(request, connSocket);
                 answer = receberServidor(connSocket);
                 print answer;
@@ -36,7 +44,7 @@ def trocaDados(connSocket, nameServer, papel, nick):
                 enviarServidor(request, connSocket);
                 answer = receberServidor(connSocket);
                 check = answer.split();
-                if answer == "FIM":
+                if answer == "FIM": #finaliza conexao
                     time.sleep(1)
                     connSocket.close();
                     print "Voce saiu do chat!\nAte a proxima!"
@@ -49,14 +57,14 @@ def trocaDados(connSocket, nameServer, papel, nick):
         
        
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def RecebeDados(ConnSocket, address, papel):
+def RecebeDados(ConnSocket, address, papel): #funcao util somente para testes 
     #a variavel papel diz respeito ao papel que esta sendo realizado, se de cliente normal ou de servidor do chat privado
     if papel == "CLIENTE":
         print "CLIENTE"
     elif papel == "SERVIDOR":
         print "SERVIDOR"
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def ConectarAServidor(nameServer, portServer):
+def ConectarAServidor(nameServer, portServer): #faz uma conexao a um server
     clientSocket = socket(AF_INET, SOCK_STREAM) # criacao do socket TCP
     clientSocket.connect((nameServer, portServer)) # conecta o socket ao servidor
     nick = defineNickName(clientSocket);
@@ -64,12 +72,23 @@ def ConectarAServidor(nameServer, portServer):
     t = Thread(target = trocaDados, args = (clientSocket, nameServer, 'CLIENTE', nick))
     t.start()
     return clientSocket
+
+def ConectarAServidorPrivado(nameServer, portServer,nick): #faz uma conexao a um server
+    clientSocket = socket(AF_INET, SOCK_STREAM) # criacao do socket TCP
+    clientSocket.connect((nameServer, portServer)) # conecta o socket ao servidor
+   # nick = defineNickName(clientSocket);
+    #nicknames.append(nick);
+    t = Thread(target = trocaDados, args = (clientSocket, nameServer, 'CLIENTE', nick))
+    t.start()
+    return clientSocket
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def ReceberConexao(nameServer, portServer, maxConn, nick):
+def ReceberConexao(nameServer, portServer, maxConn, nick): #vira um server para conexoes privadas
     serverSocket = socket(AF_INET, SOCK_STREAM) # criacao do socket TCP
+    portServer = 13000;
     serverSocket.bind((nameServer, portServer)) # bind do ip do servidor com a porta
     serverSocket.listen(maxConn) # socket pronto para "ouvir" conexoes
-    print nick + "Ouvindo..."
+    print nick + " Ouvindo..."
+    print portServer
     while 1:
         connectionSocket, addr = serverSocket.accept() # aceita a conexao do cliente (chat privado)
         #print "Conectado a " + str(addr[0]) + str(addr[1])
@@ -77,7 +96,7 @@ def ReceberConexao(nameServer, portServer, maxConn, nick):
         t.start()        
 #--------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def defineNickName(connSocket):
+def defineNickName(connSocket): #muda nick name
     tes = 1;
     while tes:
         request = raw_input("Digite seu Nickname: ")
@@ -106,11 +125,11 @@ def defineNickName(connSocket):
 #--------------------------------------------------------------------------------------------------------------------------------------#
     
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def receberServidor(connSocket):
+def receberServidor(connSocket): #recebe msgs de um servidor
     dado = connSocket.recv(1024) # recebe do servidor a resposta
     return dado
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def enviarServidor(arg, connSocket):
+def enviarServidor(arg, connSocket): #envia msgs para o servidor
     if arg == '':
         connSocket.send(" ")
     else:
