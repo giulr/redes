@@ -1,13 +1,7 @@
 from socket import * # sockets
 from threading import Thread # thread
 import time
-def reDadoCliente(conn,addr, papel):
-    dado = conn.recv(1024);
-    nickname = dado;
-    nicknames.append(nickname);
-    sentence = "Ola " + nickname +"!";
-    conn.send(sentence);
-    print nickname + " entrou na sala...";
+def reDadoCliente(conn,addr, papel, nickname):
     while 1:
         try:
             dado = conn.recv(1024);
@@ -30,12 +24,14 @@ def reDadoCliente(conn,addr, papel):
             if dado == "lista()":
                 mostrarConexoes();
                 sentence = "Mostrando clientes conectados ao servidor...";
-                conn.send(sentence);
+                enviarMsgTodos(serverSocket, sentence);
+                
             if dado == "privado()":
                 conn.send("Digite o usuario com o qual deseja iniciar uma conversa privada: ");
                 user = conn.recv(1024);
-                sendRequest(user, addr);
-                conn.send("Teste");
+                #print "O user eh: " + user;
+                sendRequest(user, nickname, addr);
+                #conn.send("Teste");
                 #pvtThread = Thread(target = conversaPrivada, args = (user, nickname, addr[0], addr[1]))
                 #conn.close();
                 #conversaPrivada(user, nickname,addr[0],addr[1]);
@@ -51,8 +47,8 @@ def reDadoCliente(conn,addr, papel):
         except:
             enviarMsgTodos(serverSocket, "Cliente offline")
 
-def RecebeDados(ConnSocket, address, papel):
-    print "oi"
+#def RecebeDados(ConnSocket, address, papel):
+    #print "oi"
     #a variavel papel diz respeito ao papel que esta sendo realizado, se de cliente normal ou de servidor do chat privado
     #if papel == "CLIENTE":
         #print "CLIENTE"
@@ -74,9 +70,9 @@ def ReceberConexao(nameServer, portServer, maxConn):
         #print "Conectado a (%s:%s)" %(addr[0], (addr[1])
 	#recebe e define o nickname do novo cliente
         sockets.append(connSocket)
-	DefineNickName(connSocket)
+	nickname = DefineNickName(connSocket)
 	addresses.append(addr);
-        t = Thread(target = reDadoCliente, args = (connSocket, addr, 'SERVIDOR'))
+        t = Thread(target = reDadoCliente, args = (connSocket, addr, 'SERVIDOR', nickname))
         t.start()
 def DefineNickName(ConnSocket):
     dado = ConnSocket.recv(1024);
@@ -85,20 +81,21 @@ def DefineNickName(ConnSocket):
     sentence = "Ola " + nickname +"!";
     ConnSocket.send(sentence);
     print nickname + " entrou na sala...";
+    return nickname;
     
-def sendRequest(user, address):
+def sendRequest(user, nickname, address):
     for idx, nick in enumerate(nicknames):
         if nick == user:
-            sockets[idx].send("pvt");
-            sockets[idx].send("O usuario " + nickname + "quer iniciar uma conversa privada. Aceita? Responda [S/N]");
-            sockets[idx].send(address);
+            #socket[idx].send("TETSE");
+            sockets[idx].send("pvt " + nickname + " quer iniciar uma conversa privada. Aceita? Responda [S/N]\n");
+            #sockets[idx].send(address);
     
 def srcNickName(user):
     for idx, nick in enumerate(nicknames):
         if nick == user:
             return idx;
 
-#class Conexion      
+     
 def mostrarConexoes():
     print "Clientes conectados: "
     for idx, addr in enumerate(addresses):
@@ -134,7 +131,8 @@ addresses = [];
 ports = [];
 print "Servidor TCP esperando conexoes na porta %d ..." % (serverPort)
 print "Cliente ou servidor? [C/S]";
-resposta = raw_input()
+resposta = raw_input();
+resposta.upper();
 if resposta == "C":
     ConectarAServidor(serverName, serverPort)    
 elif resposta == "S":

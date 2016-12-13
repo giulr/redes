@@ -1,33 +1,51 @@
 from socket import * #socket
 from threading import Thread # thread
 import time
-  
-def trocaDados(connSocket, nameServer, papel):
+import re  
+def trocaDados(connSocket, nameServer, papel, nick):
+    check = 'NOT A CRITERIA';
     while 1:
-        print "You: "
-        request = raw_input();
-        if request == "mais()":
-            mais();
-        if request == "nome()":
-            enviarServidor(request, connSocket);
-            answer = receberServidor(connSocket);
-            print answer;
-            request = raw_input();
-            enviarServidor(request,connSocket);
-            answer = receberServidor(connSocket);
-            nickname = answer;
-            print answer;
-        else:
-            enviarServidor(request, connSocket);
-            answer = receberServidor(connSocket);
-            if answer == "FIM":
-                time.sleep(1)
+        if check[0] == "pvt":
+            request = raw_input("esta aqui?");
+
+            if request == "S":
+                enviarServidor(nameServer, connSocket);
+                papel = 'SERVIDOR'
+                t2 = Thread (target = ReceberConexao, args = (nameServer, papel, AceitaMaxConn, nick));
+                t2.start();
                 connSocket.close();
-                print "Voce saiu do chat!\nAte a proxima!"
-                time.sleep(3)
-                break;
-            else:
+               
+                
+                
+        else:
+            print "You: "
+            request = raw_input();
+            if request == "mais()":
+                mais();
+            if request == "nome()":
+                enviarServidor(request, connSocket);
+                answer = receberServidor(connSocket);
                 print answer;
+                request = raw_input();
+                enviarServidor(request,connSocket);
+                answer = receberServidor(connSocket);
+                nickname = answer;
+                print answer;
+                
+            else:
+                enviarServidor(request, connSocket);
+                answer = receberServidor(connSocket);
+                check = answer.split();
+                if answer == "FIM":
+                    time.sleep(1)
+                    connSocket.close();
+                    print "Voce saiu do chat!\nAte a proxima!"
+                    time.sleep(3)
+                    break;
+                if check[0] == "pvt":
+                    print answer;
+                else:
+                    print answer;
         
        
 #--------------------------------------------------------------------------------------------------------------------------------------#
@@ -43,19 +61,19 @@ def ConectarAServidor(nameServer, portServer):
     clientSocket.connect((nameServer, portServer)) # conecta o socket ao servidor
     nick = defineNickName(clientSocket);
     nicknames.append(nick);
-    t = Thread(target = trocaDados, args = (clientSocket, nameServer, 'CLIENTE'))
+    t = Thread(target = trocaDados, args = (clientSocket, nameServer, 'CLIENTE', nick))
     t.start()
     return clientSocket
 #--------------------------------------------------------------------------------------------------------------------------------------#
-def ReceberConexao(nameServer, portServer, maxConn):
+def ReceberConexao(nameServer, portServer, maxConn, nick):
     serverSocket = socket(AF_INET, SOCK_STREAM) # criacao do socket TCP
     serverSocket.bind((nameServer, portServer)) # bind do ip do servidor com a porta
     serverSocket.listen(maxConn) # socket pronto para "ouvir" conexoes
-    print "Ouvindo..."
+    print nick + "Ouvindo..."
     while 1:
         connectionSocket, addr = serverSocket.accept() # aceita a conexao do cliente (chat privado)
         #print "Conectado a " + str(addr[0]) + str(addr[1])
-        t = Thread(target = trocaDados, args = (connectionSocket, addr, 'SERVIDOR'))
+        t = Thread(target = trocaDados, args = (connectionSocket, addr, 'SERVIDOR', nick))
         t.start()        
 #--------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------#
@@ -103,8 +121,8 @@ AceitaMaxConn = 1
 serverName = 'localhost'
 serverPort = 12000
 nicknames = [];
-print "Cliente ou servidor? [C/S]";
-resposta = raw_input()
+#print "Cliente ou servidor? [C/S]";
+#resposta = raw_input()
 resposta = 'C'; #definindo C como padrao ja que esse e o cliente
 
 if resposta == "C":
