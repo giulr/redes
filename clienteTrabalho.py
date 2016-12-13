@@ -1,7 +1,7 @@
 from socket import * #socket
 from threading import Thread # thread
 import time
-import re  
+import re
 def trocaDados(connSocket, nameServer, papel, nick):
     check = 'NOT A CRITERIA';
     while 1:
@@ -14,9 +14,9 @@ def trocaDados(connSocket, nameServer, papel, nick):
                 t2 = Thread (target = ReceberConexao, args = (nameServer, papel, AceitaMaxConn, nick));
                 t2.start();
                 connSocket.close();
-               
-                
-                
+
+
+
         else:
             print "You: "
             request = raw_input();
@@ -31,7 +31,7 @@ def trocaDados(connSocket, nameServer, papel, nick):
                 answer = receberServidor(connSocket);
                 nickname = answer;
                 print answer;
-                
+
             else:
                 enviarServidor(request, connSocket);
                 answer = receberServidor(connSocket);
@@ -46,8 +46,8 @@ def trocaDados(connSocket, nameServer, papel, nick):
                     print answer;
                 else:
                     print answer;
-        
-       
+
+
 #--------------------------------------------------------------------------------------------------------------------------------------#
 def RecebeDados(ConnSocket, address, papel):
     #a variavel papel diz respeito ao papel que esta sendo realizado, se de cliente normal ou de servidor do chat privado
@@ -74,7 +74,7 @@ def ReceberConexao(nameServer, portServer, maxConn, nick):
         connectionSocket, addr = serverSocket.accept() # aceita a conexao do cliente (chat privado)
         #print "Conectado a " + str(addr[0]) + str(addr[1])
         t = Thread(target = trocaDados, args = (connectionSocket, addr, 'SERVIDOR', nick))
-        t.start()        
+        t.start()
 #--------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------#
 def defineNickName(connSocket):
@@ -97,14 +97,14 @@ def defineNickName(connSocket):
             answer = receberServidor(connSocket)
             #t = Thread(target = trocaDados, args = (connSocket, addr)
             #t.start()
-            
+
             print answer
             return nickname;
         else:
             print "Por favor Digite seu nome sem ser apenas espaco e tenha algum nome ou algo to tipo."
             tes = 1
 #--------------------------------------------------------------------------------------------------------------------------------------#
-    
+
 #--------------------------------------------------------------------------------------------------------------------------------------#
 def receberServidor(connSocket):
     dado = connSocket.recv(1024) # recebe do servidor a resposta
@@ -130,13 +130,11 @@ if resposta == "C":
     connSocket = ConectarAServidor(serverName, serverPort);
 elif resposta == "S":
     ReceberConexao(serverName, serverPort, AceitaMaxConn);
-    #serverSocket.close(); # encerra o socket do servidor    
-            
-       
+    #serverSocket.close(); # encerra o socket do servidor
+
+
 
 def mais():
     print 'Digite nome() para alterar o seu Nickname\n'
     print "Digite lista() para mostrar todos os participantes do chat\n"
     print 'Digite sair() para sair do chat\n'
-
-  
