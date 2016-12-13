@@ -3,9 +3,28 @@ from threading import Thread # thread
 import time
 def reDadoCliente(conn,addr, papel, nickname):
     while 1:
+        check = "NOT A CRITERIA"
         try:
             dado = conn.recv(1024);
-            if dado == "sair()" or dado == '':
+            check = dado.split();
+            #pego = 0
+	    #contador = contador + 1
+	    #dado = conn.recv(1024);
+	    #tempo2 = time.clock()
+
+            #if tempo2 - tempo1 >= 10.0:
+               # tempo1 = time.clock()
+               # contador = 0
+
+            #if contador >= 5 or pego > 30:
+               # sentence = "Escreveu rapido demais!\nPorfavor Espere 5s"
+                #conn.send(sentence)
+                #time.sleep(5)
+                #contador = 0
+                #pego = pego + 1
+                #sentence = "Ja se passaram 5s, Pode continuar, mas cuidado!"
+                #conn.send(sentence)
+            if dado == "sair()":
                 print"Cliente (%s)[%s:%s]:Saiu" % (nickname, addr[0],addr[1])
                 sentence = "FIM";
                 conn.send(sentence)
@@ -28,24 +47,24 @@ def reDadoCliente(conn,addr, papel, nickname):
                 
             if dado == "privado()":
                 conn.send("Digite o usuario com o qual deseja iniciar uma conversa privada: ");
-                user = conn.recv(1024);
-                #print "O user eh: " + user;
+                user = conn.recv(1024); #falta checar se o nickname existe
                 sendRequest(user, nickname, addr);
-                #conn.send("Teste");
-                #pvtThread = Thread(target = conversaPrivada, args = (user, nickname, addr[0], addr[1]))
-                #conn.close();
-                #conversaPrivada(user, nickname,addr[0],addr[1]);
+               
             if dado == "S":
                 print "RESPONDEU SIM"
                 
                 #fechar conexao
+            #if check[0] == "localhost":
+                #conn.send("Inciando conexao privada!");
+                
             else:
                 msgServer = nickname + " escreveu: " + dado + "\n";
                 
                 enviarMsgTodos(serverSocket,msgServer);
                 print nickname + " escreveu: " + dado;
         except:
-            enviarMsgTodos(serverSocket, "Cliente offline")
+           flag = 1;
+           
 
 #def RecebeDados(ConnSocket, address, papel):
     #print "oi"
@@ -113,7 +132,6 @@ def enviarMsgTodos(serverSocket, mensagem):
                 socket.send(mensagem)
             except :
                 socket.close()
-                print "erro"
                 if socket in sockets:
                     sockets.remove(socket)
 
@@ -131,8 +149,9 @@ addresses = [];
 ports = [];
 print "Servidor TCP esperando conexoes na porta %d ..." % (serverPort)
 print "Cliente ou servidor? [C/S]";
-resposta = raw_input();
-resposta.upper();
+#resposta = raw_input();
+#resposta.upper();
+resposta = "S";
 if resposta == "C":
     ConectarAServidor(serverName, serverPort)    
 elif resposta == "S":
